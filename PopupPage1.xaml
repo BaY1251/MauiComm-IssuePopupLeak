@@ -1,14 +1,37 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <toolkit:Popup xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
-             x:Class="MauiComm_IssuePopupLeak.PopupPage1" Size="300,300">
+			   xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+			   xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+			   x:Class="MauiComm_IssuePopupLeak.PopupPage1"
+			   Size="1920,1080"
+			   Color="Black">
 
-    <Grid WidthRequest="100">
-        <Grid WidthRequest="10" HeightRequest="10" VerticalOptions="Start" HorizontalOptions="Start" BackgroundColor="Blue" />
-        <Grid WidthRequest="10" HeightRequest="10" VerticalOptions="Start" HorizontalOptions="End" BackgroundColor="Blue" />
-        <Grid WidthRequest="10" HeightRequest="10" VerticalOptions="End" HorizontalOptions="Start" BackgroundColor="Blue" />
-        <Grid WidthRequest="10" HeightRequest="10" VerticalOptions="End" HorizontalOptions="End" BackgroundColor="Blue" />
-    </Grid>
+	<Grid WidthRequest="100">
+		<Label x:Name="L_Count"
+			   FontSize="72"
+			   Text="White"
+			   VerticalOptions="Start"
+			   HorizontalTextAlignment="Center" />
+		<Grid WidthRequest="10"
+			  HeightRequest="10"
+			  VerticalOptions="Start"
+			  HorizontalOptions="Start"
+			  BackgroundColor="Blue" />
+		<Grid WidthRequest="10"
+			  HeightRequest="10"
+			  VerticalOptions="Start"
+			  HorizontalOptions="End"
+			  BackgroundColor="Blue" />
+		<Grid WidthRequest="10"
+			  HeightRequest="10"
+			  VerticalOptions="End"
+			  HorizontalOptions="Start"
+			  BackgroundColor="Blue" />
+		<Grid WidthRequest="10"
+			  HeightRequest="10"
+			  VerticalOptions="End"
+			  HorizontalOptions="End"
+			  BackgroundColor="Blue" />
+	</Grid>
 
 </toolkit:Popup>
