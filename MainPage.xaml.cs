@@ -108,28 +108,32 @@ public partial class MainPage : ContentPage
 	{
 		var escapedTime = 1;
 		PopupPage1 popup = new();
-		ThreadPool.QueueUserWorkItem(async delegate
+		popup?.Update(showCnt.ToString());
+		popup.Opened += delegate
 		{
-			Debug.WriteLine(2);
-			do
+			ThreadPool.QueueUserWorkItem(async delegate
 			{
-				MainThread.BeginInvokeOnMainThread(() => popup?.Update(showCnt.ToString()));
-				Thread.Sleep(300);
-			} while(--escapedTime > 0); //到达时间或点停止时,退出倒计时
+				Debug.WriteLine(3);
+				do
+				{
+					MainThread.BeginInvokeOnMainThread(() => popup?.Update(showCnt.ToString()));
+					Thread.Sleep(300);
+				} while(--escapedTime > 0); //到达时间或点停止时,退出倒计时
 
-			Debug.WriteLine(4);
-			await popup.CloseAsync();
-			if(escapedTime == 0)
-			{
-				Debug.WriteLine(5);
-				Debug.WriteLine($"-{showCnt++}-");
-				Shell.Current.Dispatcher.DispatchDelayed(TimeSpan.FromMilliseconds(300), () => AutoStart());
-			}
-		});
+				Debug.WriteLine(4);
+				await popup.CloseAsync();
+				if(escapedTime == 0)
+				{
+					Debug.WriteLine(5);
+					Debug.WriteLine($"-{showCnt++}-");
+					Shell.Current.Dispatcher.DispatchDelayed(TimeSpan.FromMilliseconds(10), () => AutoStart());
+				}
+			});
+		};
 
 		Debug.WriteLine(1);
 		this.ShowPopup(popup);
-		Debug.WriteLine(3);
+		Debug.WriteLine(2);
 	}
 
 	void btnShow_Clicked(object sender, EventArgs e)
