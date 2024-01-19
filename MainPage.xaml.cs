@@ -1,13 +1,11 @@
 ﻿using System.Diagnostics;
 using CommunityToolkit.Maui.Views;
+
 namespace MauiComm_IssuePopupLeak;
 
-#if false
 public partial class MainPage : ContentPage
 {
-	int maxShowCnt = int.MaxValue;
-	int showCnt = 0;
-	bool isShow = false;
+	volatile int showCnt = 0;
 
 	public MainPage()
 	{
@@ -16,6 +14,7 @@ public partial class MainPage : ContentPage
 
 	void btnShow_Clicked(object sender, EventArgs e)
 	{
+#if false
 		var timer = Dispatcher.CreateTimer();
 		timer.Interval = TimeSpan.FromMilliseconds(250);
 		showCnt = 0;
@@ -41,67 +40,15 @@ public partial class MainPage : ContentPage
 				await popup.CloseAsync();
 				isShow = false;
 				showCnt++;
+				GC.Collect();
 			}
 		};
 		timer.Start();
-	}
-}
 #else
-public partial class MainPage : ContentPage
-{
-	int showCnt = 0;
-
-	public MainPage()
-	{
-		InitializeComponent();
-	}
-
-	protected override void OnAppearing()
-	{
-		base.OnAppearing();
-	}
-
-	private void Show()
-	{
-		Timer timer = null;
-		PopupPage1 popup = new();
-		popup.Opened += delegate
-		{
-			timer = new Timer(s =>
-			{
-				MainThread.BeginInvokeOnMainThread(delegate
-				{
-					if(++showCnt % 2 == 0)
-					{
-						try
-						{
-							if(popup is null)
-							{
-								Shell.Current?.DisplayAlert("popup", "null", "OK");
-							}
-							popup?.Close(null);
-							popup = null;
-						}
-						catch(Exception x)
-						{
-							Shell.Current?.DisplayAlert("popup", x.Message, "OK");
-						}
-					}
-					else
-					{
-						popup?.Update(showCnt.ToString());
-					}
-				});
-			}, null, 0, 250); //定时更新
-		};
-
-		popup.Closed += (s, e) =>
-		{
-			timer.Dispose();
-			Dispatcher.DispatchDelayed(TimeSpan.FromMilliseconds(250), Show);
-		};
-
-		Shell.Current.ShowPopup(popup);
+		showCnt = 0;
+		(sender as View).IsVisible = false;
+		AutoStart();
+#endif
 	}
 
 	private void AutoStart()
@@ -116,18 +63,19 @@ public partial class MainPage : ContentPage
 				Debug.WriteLine(3);
 				do
 				{
-					MainThread.BeginInvokeOnMainThread(() => popup?.Update(showCnt.ToString()));
-					Thread.Sleep(300);
-				} while(--escapedTime > 0); //到达时间或点停止时,退出倒计时
+					await MainThread.InvokeOnMainThreadAsync(() => popup?.Update(showCnt.ToString()));
+					Thread.Sleep(100);
+				} while(--escapedTime > 0);
 
 				Debug.WriteLine(4);
-				await popup.CloseAsync();
-				if(escapedTime == 0)
+				MainThread.BeginInvokeOnMainThread(async delegate
 				{
 					Debug.WriteLine(5);
+					await popup.CloseAsync();
 					Debug.WriteLine($"-{showCnt++}-");
 					Shell.Current.Dispatcher.DispatchDelayed(TimeSpan.FromMilliseconds(10), () => AutoStart());
-				}
+					GC.Collect();
+				});
 			});
 		};
 
@@ -135,12 +83,4 @@ public partial class MainPage : ContentPage
 		this.ShowPopup(popup);
 		Debug.WriteLine(2);
 	}
-
-	void btnShow_Clicked(object sender, EventArgs e)
-	{
-		showCnt = 0;
-		(sender as View).IsVisible = false;
-		AutoStart();
-	}
 }
-#endif
