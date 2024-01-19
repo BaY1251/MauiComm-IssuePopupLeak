@@ -74,7 +74,7 @@ public partial class MainPage : ContentPage
 					await popup.CloseAsync();
 					Debug.WriteLine($"-{showCnt++}-");
 					Shell.Current.Dispatcher.DispatchDelayed(TimeSpan.FromMilliseconds(10), () => AutoStart());
-					GC.Collect();
+					//GC.Collect();
 				});
 			});
 		};
